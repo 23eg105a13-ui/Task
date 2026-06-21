@@ -1,0 +1,136 @@
+{
+  "info": {
+    "name": "GitHub Profile Analyzer API",
+    "description": "Backend service that analyzes GitHub user profiles via the GitHub REST API and stores insights in MySQL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "username",
+      "value": "octocat",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+      }
+    },
+    {
+      "name": "API Root / Docs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"], "path": [""] }
+      }
+    },
+    {
+      "name": "Analyze a GitHub Profile",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/analyze",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profiles", "analyze"]
+        },
+        "description": "Fetches the public GitHub profile + repos for the given username, computes insights, and stores/updates the result in MySQL."
+      }
+    },
+    {
+      "name": "List All Analyzed Profiles",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles?page=1&limit=10&sortBy=followers_count&order=DESC",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profiles"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" },
+            { "key": "sortBy", "value": "followers_count", "description": "followers_count | activity_score | public_repos_count | analyzed_at" },
+            { "key": "order", "value": "DESC", "description": "ASC | DESC" },
+            { "key": "search", "value": "", "description": "optional: filter by username/name", "disabled": true }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get a Single Profile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/{{username}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profiles", "{{username}}"]
+        },
+        "description": "Returns full stored detail for a previously analyzed profile, including top repositories and historical analysis snapshots."
+      }
+    },
+    {
+      "name": "Delete a Profile",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/{{username}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profiles", "{{username}}"]
+        }
+      }
+    },
+    {
+      "name": "Get Aggregate Stats Summary",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/stats/summary",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profiles", "stats", "summary"]
+        },
+        "description": "Bonus dashboard endpoint: aggregate stats across every analyzed profile."
+      }
+    },
+    {
+      "name": "Error Case: Invalid Username Format",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"-bad-username\"\n}" },
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/analyze",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profiles", "analyze"]
+        }
+      }
+    },
+    {
+      "name": "Error Case: Profile Not Found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/this-user-should-not-exist-zzz",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profiles", "this-user-should-not-exist-zzz"]
+        }
+      }
+    }
+  ]
+}
