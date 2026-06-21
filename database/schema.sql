@@ -5,11 +5,10 @@
 -- Or it is applied automatically by `npm run migrate`.
 -- =====================================================================
 
-CREATE DATABASE IF NOT EXISTS github_analyzer
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
 
-USE github_analyzer;
+-- Note: Database creation and USE statements are handled programmatically by migrate.ts
+-- to support managed cloud databases (like Aiven/Railway) that pre-allocate databases.
+
 
 -- ---------------------------------------------------------------------
 -- profiles

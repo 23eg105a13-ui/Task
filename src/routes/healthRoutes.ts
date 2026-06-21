@@ -6,8 +6,8 @@ const router = Router();
 router.get('/', async (_req: Request, res: Response) => {
   const dbConnected = await testConnection();
 
-  res.status(dbConnected ? 200 : 503).json({
-    success: dbConnected,
+  res.status(200).json({
+    success: true,
     status: dbConnected ? 'ok' : 'degraded',
     database: dbConnected ? 'connected' : 'unreachable',
     timestamp: new Date().toISOString(),

@@ -262,14 +262,46 @@ A few choices worth calling out, since the brief explicitly invited adding impro
 
 ## Deployment
 
-This project has **not** been deployed yet — it's built to be deployment-ready on any standard Node host. A typical free-tier path:
+This service is configured for direct deployment to [Render](https://render.com) using an external managed MySQL database (like [Aiven](https://aiven.io), which offers a permanent free-tier MySQL instance).
 
-1. **Database:** a managed MySQL instance (e.g. [Aiven](https://aiven.io), [Railway](https://railway.app), [PlanetScale](https://planetscale.com), or [Clever Cloud](https://www.clever-cloud.com)).
-2. **App host:** [Railway](https://railway.app), [Render](https://render.com), or [Fly.io](https://fly.io) — all support: set env vars → `npm run build` → `npm start`.
-3. Run `npm run migrate` once against the production database (or paste `database/schema.sql` into the provider's SQL console).
-4. Set `GITHUB_TOKEN` in the host's environment variables to avoid rate-limit issues in production.
+Live API URL: `https://task-y7mx.onrender.com`
 
-> Once deployed, replace this section (and the submission email/form) with your live API URL.
+Follow these step-by-step instructions to get the application fully set up and running live:
+
+### Step 1: Set Up your MySQL Database (e.g. Aiven)
+Render does not offer free native MySQL hosting. Using a dedicated MySQL host like **Aiven** ensures your database is reliable and remains free.
+
+1. Sign up/Log in to [Aiven.io](https://aiven.io).
+2. Create a new service:
+   - **Service Type:** MySQL
+   - **Cloud Provider / Region:** Choose any free region (e.g., `aws-us-east-1` or closest to you)
+   - **Service Plan:** Free (Hobbyist tier)
+   - **Service Name:** `mysql-github-analyzer` (or similar)
+3. Once the database is running (it takes 2–3 minutes to provision):
+   - Under connection details, copy the individual components: **Host**, **Port** (usually `10000` or above), **User** (defaults to `avnadmin`), **Password**, and **Database** (defaults to `defaultdb`).
+
+### Step 2: Deploy the Web Service on Render
+1. Sign up/Log in to [Render.com](https://render.com).
+2. Click **New** -> **Web Service**.
+3. Connect your GitHub repository: `https://github.com/23eg105a13-ui/Task` (ensure Render has access).
+4. Configure the service settings:
+   - **Name:** `task` (Render will generate the subdomain, e.g. `task-y7mx`)
+   - **Region:** Choose the region closest to your Aiven database
+   - **Branch:** `main`
+   - **Runtime:** `Node`
+   - **Build Command:** `npm run build`
+   - **Start Command:** `npm run start:prod` (this automatically runs database migrations first and then launches the server)
+5. Under **Environment Variables**, click **Add Environment Variable** and add the following settings:
+   - `DB_HOST`: *Your Aiven MySQL host name*
+   - `DB_PORT`: *Your Aiven MySQL port*
+   - `DB_USER`: *Your Aiven MySQL user (typically `avnadmin`)*
+   - `DB_PASSWORD`: *Your Aiven MySQL password*
+   - `DB_NAME`: *Your database name (typically `defaultdb`)*
+   - `NODE_ENV`: `production`
+   - `GITHUB_TOKEN`: *Your GitHub Personal Access Token (Classic with no scopes needed, classic token raises unauthenticated rate limit from 60 to 5000 requests/hour).*
+6. Click **Deploy Web Service**.
+
+Render will compile the TypeScript source, run the database migrations to automatically create your tables, and start the API!
 
 ---
 
